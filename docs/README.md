@@ -61,7 +61,7 @@ All requests must carry a `X-dPay-Signature` header. This is HMAC signature obta
 
   const hash = CryptoJS.HmacSHA1(
     payload,
-    pm.environment.get('<app secret as configured in dPay>')
+    '<app secret as configured in dPay>'
   ).toString(CryptoJS.enc.Hex)
   
 
