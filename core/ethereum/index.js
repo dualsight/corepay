@@ -121,25 +121,25 @@ const parseNextBlock = (cfgCollection, addrCollection, nodeClient) => {
     ) // get current block height from node
       .then(async bh => {
         const blockHeight = BigNumber(bh)
-        const $bp = await new Promise(resolve => {
+        const [$bp, isInitial] = await new Promise(resolve => {
           // fetch block progress from storage
           const bp = cfgCollection.findObject({ $: 'block_progress' })
 
           if (bp) {
-            resolve(bp)
+            resolve([bp, false])
           } else { // if progress doesn't exist, set initial
-            const newHeight = BigNumber(config.cores[coreIdentifier].initialBlockHeight).isEqualTo(0)
+            const initialBlock = BigNumber(config.cores[coreIdentifier].initialBlockHeight)
+            const newHeight = (initialBlock.isEqualTo(0) || initialBlock.isNaN())
               ? blockHeight.toString()
               : config.cores[coreIdentifier].initialBlockHeight
 
-            resolve(cfgCollection.insert({ $: 'block_progress', value: newHeight }))
+            resolve([cfgCollection.insert({ $: 'block_progress', value: newHeight }), true])
           }
         })
-        
+
         // set block progress to current block height if unset
         let blockProgress = BigNumber($bp.value)
-
-        if (blockProgress.isNaN()) return
+        if (blockProgress.isNaN() || (!isInitial && blockProgress.minus(1).isEqualTo(bh))) return resolveRun(true)
 
         const [nextBlockHeight, deposits] = await parseBlockByHeight(blockProgress, blockHeight, addrCollection, nodeClient)
 
@@ -193,7 +193,8 @@ const boot = () => {
 
       if (collection === null) {
         collection = storage.addCollection(
-          `${coreIdentifier}.config`
+          `${coreIdentifier}.config`,
+          { unique: ['$'] }
         )
       }
 
@@ -230,6 +231,7 @@ const boot = () => {
         for (const client of Object.keys(clientLib)) {
           if (clientInfo.match(client)) {
             // step 2B: identify node client
+            cfgCollection.remove(cfgCollection.find({ $: 'node_client' }))
             nodeClient = cfgCollection.insert({ $: 'node_client', name: client })
             break
           }
@@ -385,7 +387,9 @@ const getDepositAddress = (app, meta) => {
       return reject(new Error('Invalid wallet type!'))
     }
 
-    const addrType = meta.type || nodeNetworkType
+    const addrType = meta
+      ? meta.type || nodeNetworkType
+      : nodeNetworkType
     const $addrNonce = addrNonceCollection.findObject({
       $: addrType,
       appId: app.id
