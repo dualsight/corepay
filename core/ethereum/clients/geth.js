@@ -31,7 +31,11 @@ const _parseCallToDeposits = (callObject, receipt, addrCollection, highestBlock,
       value: uintValue.div(Math.pow(10, 18)).toString(),
       beneficiary,
       txid: receipt.transactionHash,
-      meta: { index: `ct_${index}}`, benefactor },
+      meta: {
+        appId: $addr.account,
+        index: `ct_${index}}`,
+        benefactor
+      },
       confirmations: highestBlock.minus(receipt.blockNumber).toString()
     })
   }

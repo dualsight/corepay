@@ -33,6 +33,7 @@ module.exports = {
                       beneficiary: result[1],
                       txid: log.transactionHash,
                       meta: {
+                        appId: $addr.account,
                         index: `el_${i}_${BigNumber(log.logIndex).toString()}`,
                         contract: receipt.to,
                         benefactor: result[0],

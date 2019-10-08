@@ -50,14 +50,19 @@ const parseBlockByHeight = (blockNumber) => {
                     for (const tx of resArr) { // step through each response
                       if (tx.hex) { // if response is tx
                         for (const i in tx.details) {
-                          if (tx.details[i].category === 'receive') {
+                          const $addr = addrCollection.findObject({ $: tx.details[i].address })
+
+                          if ($addr && tx.details[i].category === 'receive') {
                             deposits.push({
                               core: coreIdentifier,
                               symbol: 'BTC',
                               value: BigNumber(tx.details[i].amount).toString(),
                               beneficiary: tx.details[i].address,
                               txid: tx.txid,
-                              meta: { index: BigNumber(tx.details[i].vout).toString() },
+                              meta: {
+                                appId: $addr.account,
+                                index: BigNumber(tx.details[i].vout).toString()
+                              },
                               confirmations: BigNumber(tx.confirmations).toString()
                             })
                           }

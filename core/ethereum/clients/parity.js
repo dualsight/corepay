@@ -53,6 +53,7 @@ module.exports = {
                 beneficiary,
                 txid: receipt.transactionHash,
                 meta: {
+                  appId: $addr.account,
                   index: `ct_${i}_${callObject.traceAddress.toString() || 'v'}`,
                   benefactor
                 },

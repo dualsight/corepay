@@ -268,7 +268,7 @@ const boot = () => {
                     for (const file of keystoreFiles) {
                       const addr = `0x${file.split('--')[2]}`.toLowerCase()
       
-                      addrCollection.insert({$: addr, account: dir })
+                      addrCollection.insert({$: addr, account: parseInt(dir) })
       
                       // step 3B: set hot wallet
                       if (stringEquals(
@@ -425,7 +425,7 @@ const getDepositAddress = (app, meta) => {
           (err) => {
             if (err) reject(err)
 
-            addrCollection.insert({ $: String(wallet.signingKey.address).toLowerCase() })
+            addrCollection.insert({ $: String(wallet.signingKey.address).toLowerCase(), account: parseInt(app.id) })
             addrNonceCollection.update($addrNonce)
             resolve({ 
               address: wallet.signingKey.address,
