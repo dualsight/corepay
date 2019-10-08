@@ -8,7 +8,7 @@ Integrating payments into applications is practically tedious, unless one is to 
 Integrating trustless cryptocurrency payment solutions can be painfully difficult. Security with crypto-based payment systems is no different than traditional payment systems: It depends on several factors beyond the scope of this project.
 
 ### How It Works
-Corepay server communicates with self-hosted cryptocurrency network nodes like [Bitcoin Core](https://bitcoin.org/en/bitcoin-core), [Go Ethereum](https://geth.ethereum.org) and [Parity Ethereum](https://www.parity.io) primarily over RPC, so in order to enable support for an asset, you'll have to setup a network node client that Corepay can talk to.
+Corepay server communicates with self-hosted cryptocurrency network nodes like [Bitcoin Core](https://bitcoin.org/en/bitcoin-core), [Go Ethereum](https://geth.ethereum.org) and [Parity Ethereum](https://www.parity.io) primarily over RPC, so in order to enable support for an asset, you'll have to setup a network node client Corepay can talk to.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/12427840/66406300-51c19580-e9e3-11e9-8b11-f889b971a8c4.png" alt="Corepay diagram" />
