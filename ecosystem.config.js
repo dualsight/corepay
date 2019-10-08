@@ -2,9 +2,9 @@ let processTag
 
 try {
   const { id } = require('./config.json')
-  processTag = `dPay-${id}`
+  processTag = `corepay-${id}`
 } catch (error) {
-  processTag = `dPay`
+  processTag = `corepay`
   process.exit(1)
 }
 

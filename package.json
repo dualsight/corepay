@@ -1,6 +1,6 @@
 {
-  "name": "dpay",
-  "version": "1.0.0",
+  "name": "corepay",
+  "version": "0.0.1",
   "description": "A unified, secure and painless self-hosted cryptocurrency payments processor.",
   "main": "index.js",
   "scripts": {
@@ -8,11 +8,31 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "dpayd": "./index.js",
-    "dpay": "./cli.js"
+    "corepayd": "./index.js",
+    "corepay": "./cli.js"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dualsight/corepay.git"
+  },
+  "contributors": [
+    {
+      "name": "Redhart",
+      "email": "redhart@dualsight.org"
+    }
+  ],
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dualsight/corepay/issues"
+  },
+  "homepage": "https://github.com/dualsight/corepay#readme",
+  "keywords": [
+    "corepay",
+    "cryptocurrency",
+    "payments",
+    "bitcoin",
+    "ethereum"
+  ],
   "dependencies": {
     "async-waterfall": "^0.1.5",
     "bignumber.js": "^9.0.0",

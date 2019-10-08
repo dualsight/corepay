@@ -10,59 +10,59 @@ const runtime = require('./lib/runtime')
 
 program
   .version(version)
-  .option('-v, --version', 'print dPay version')
+  .option('-v, --version', 'print corepay version')
 
 program
   .command('configure')
-  .description('configure dPay')
+  .description('configure corepay')
   .action((env, options) => {
     require('./bootstrap')
   })
 
   program
     .command('start')
-    .description('start dPay daemon')
+    .description('start corepay daemon')
     .action((env, options) => {
       runtime
         .start()
         .then((msg) => {
-          screen.success(`dPay: ${msg}`)
+          screen.success(`corepay: ${msg}`)
           process.exit(0)
         })
         .catch((err) => {
-          screen.error(`Failed to start dPay: ${err.message}`)
+          screen.error(`Failed to start corepay: ${err.message}`)
           process.exit(1)
         })
     })
 
   program
     .command('reload')
-    .description('reload dPay daemon')
+    .description('reload corepay daemon')
     .action(async (env, options) => {
       runtime
         .reload()
         .then((msg) => {
-          screen.success(`dPay: ${msg}`)
+          screen.success(`corepay: ${msg}`)
           process.exit(0)
         })
         .catch((err) => {
-          screen.error(`Failed to reload dPay: ${err.message}`)
+          screen.error(`Failed to reload corepay: ${err.message}`)
           process.exit(1)
         })
     })
 
     program
       .command('stop')
-      .description('stop dPay daemon')
+      .description('stop corepay daemon')
       .action(async (env, options) => {
         runtime
           .stop()
           .then((msg) => {
-            screen.success(`dPay: ${msg}`)
+            screen.success(`corepay: ${msg}`)
             process.exit(0)
           })
           .catch((err) => {
-            screen.error(`Failed to stop dPay: ${err.message}`)
+            screen.error(`Failed to stop corepay: ${err.message}`)
             process.exit(1)
           })
       })

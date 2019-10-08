@@ -268,8 +268,14 @@ const ping = (app) => {
 
 const getDepositAddress = (app, meta) => {
   return new Promise(async (resolve, reject) => {
-    if (meta && meta.type && !walletTypes.includes(meta.type)) {
-      return reject(new Error('Invalid wallet type!'))
+    if (meta && meta.type) {
+      if (meta.type !== nodeNetworkType) {
+        return reject(new Error(`Cannot import ${meta.type} wallet to ${nodeNetworkType} node!`))
+      }
+
+      if (!walletTypes.includes(meta.type)) {
+        return reject(new Error('Invalid wallet type!'))
+      }
     }
 
     const addrType = (meta && meta.type) ? meta.type : nodeNetworkType
