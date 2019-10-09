@@ -5,7 +5,6 @@ const config = require('./lib/config')
 const screen = require('./lib/screen')
 const glob = require('glob')
 const path = require('path')
-const { server } = require('./lib/server')
 const Loki = require('lokijs')
 const lfsa = require('lokijs/src/loki-fs-structured-adapter')
 const adapter = new lfsa()
@@ -22,10 +21,14 @@ const loki = new Loki(
 )
 const states = require('./lib/states')
 const enabledCores = []
+let server
 let ready
 let shuttingDown
 
 function init () {
+  if (!config) process.exit(1)
+
+  server = require('./lib/server').server
   const sequence = []
   const files = glob.sync(path.join(__dirname, '.', 'core', '*', 'index.js'))
 
