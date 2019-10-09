@@ -26,7 +26,7 @@ program
       runtime
         .status()
         .then((msg) => {
-          screen.success(`corepay: ${msg}`)
+          screen.success(`Corepay: ${msg}`)
           process.exit(0)
         })
         .catch((err) => {
@@ -42,7 +42,7 @@ program
       runtime
         .start()
         .then((msg) => {
-          screen.success(`corepay: ${msg}`)
+          screen.success(`Corepay: ${msg}`)
           process.exit(0)
         })
         .catch((err) => {
@@ -58,7 +58,7 @@ program
       runtime
         .reload()
         .then((msg) => {
-          screen.success(`corepay: ${msg}`)
+          screen.success(`Corepay: ${msg}`)
           process.exit(0)
         })
         .catch((err) => {
@@ -74,7 +74,7 @@ program
         runtime
           .stop()
           .then((msg) => {
-            screen.success(`corepay: ${msg}`)
+            screen.success(`Corepay: ${msg}`)
             process.exit(0)
           })
           .catch((err) => {
