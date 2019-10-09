@@ -20,6 +20,22 @@ program
   })
 
   program
+    .command('status')
+    .description('corepay daemon status')
+    .action((env, options) => {
+      runtime
+        .status()
+        .then((msg) => {
+          screen.success(`corepay: ${msg}`)
+          process.exit(0)
+        })
+        .catch((err) => {
+          screen.error(`Failed to check corepay status: ${err.message}`)
+          process.exit(1)
+        })
+    })
+
+  program
     .command('start')
     .description('start corepay daemon')
     .action((env, options) => {
