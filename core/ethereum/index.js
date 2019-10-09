@@ -152,6 +152,7 @@ const parseNextBlock = (cfgCollection, addrCollection, nodeClient) => {
           if (deposits.length > 0) {
             push('deposit_alert', deposits)
 
+            // TODO: Sweep if configured
             // if (config.cores[coreIdentifier].wallet.sweeper) {
             //   targets = {}
 
@@ -181,6 +182,7 @@ const parseNextBlock = (cfgCollection, addrCollection, nodeClient) => {
   })
 }
 
+// TODO: Implement sweep/consolidation logic
 // const sweep = (targets) => {
 //   console.log(JSON.stringify(targets))
 // }
