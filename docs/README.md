@@ -2,8 +2,13 @@
 > This documentation is a work in progress and only gets better with each update.
 
 ## Getting Started
-### Initial Setup
+### Prerequisites:
 - Ensure you have installed Node.js v8+ & NPM with the command `node -v; npm -v`
+
+### Install via NPM:
+- `npm i -g corepay` to install Corepay.
+
+### Manual Installation
 - Download/clone this repository and `cd` to it.
 - `npm run setup` to register current directory as Corepay installation (may require elevated privileges depending on Node.js installation).
 
