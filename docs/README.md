@@ -19,6 +19,7 @@ You may proceed to start the Corepay daemon with `corepay start`.
 
 The following are basic Corepay CLI commands for controlling the Corepay daemon:
 - `corepay start`: Starts Corepay daemon.
+- `corepay status`: Reports Corepay daemon status.
 - `corepay reload`: Safely restarts Corepay daemon (useful when you've changed configuration or updated Corepay).
 - `corepay stop`: Safely stops Corepay daemon.
 
