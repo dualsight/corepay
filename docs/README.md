@@ -6,7 +6,8 @@
 - Ensure you have installed Node.js v8+ & NPM with the command `node -v; npm -v`
 
 ### Install via NPM:
-- `npm i -g corepay` to install Corepay.
+- `npm i corepay` to install Corepay locally. Or...
+- `npm i -g corepay` to install Corepay globally.
 
 ### Manual Installation
 - Download/clone this repository and `cd` to it.

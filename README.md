@@ -1,4 +1,4 @@
-# Corepay
+# Corepay [![NPM version](https://img.shields.io/npm/v/corepay.svg?style=flat)](https://www.npmjs.com/package/corepay) [![NPM monthly downloads](https://img.shields.io/npm/dm/corepay.svg?style=flat)](https://npmjs.org/package/corepay) [![NPM total downloads](https://img.shields.io/npm/dt/corepay.svg?style=flat)](https://npmjs.org/package/corepay) 
 > A unified, secure and painless self-hosted cryptocurrency payments processor.
 
 ## Introduction
