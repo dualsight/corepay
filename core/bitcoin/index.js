@@ -13,7 +13,7 @@ const bip39 = require('bip39')
 const bitcoin = require('bitcoinjs-lib')
 const bitcore = require('bitcore-lib')
 const storage = require('../../lib/db')()
-const logger = require('debugnyan')(`core:${coreIdentifier}`)
+const logger = require('../../lib/logger')(`core:${coreIdentifier}`)
 const states = require('../../lib/states')
 const walletBasePath = path.join(
   __dirname, '..', '..', 'storage', 'wallets', coreIdentifier

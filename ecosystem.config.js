@@ -14,10 +14,12 @@ module.exports = {
     name: processTag,
     script: path.join(__dirname, 'index.js'),
     env: {
-      NODE_ENV: 'production'
+      NODE_ENV: 'production',
+      PRINT_LOGS: true
     },
     env_production: {
-      NODE_ENV: 'production'
+      NODE_ENV: 'production',
+      PRINT_LOGS: true
     },
     instances: 1,
     kill_timeout: 3600000,

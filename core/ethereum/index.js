@@ -13,7 +13,7 @@ const BigNumber = require('bignumber.js')
 const storage = require('../../lib/db')()
 const { stringEquals } = require('../../lib/utils')
 const states = require('../../lib/states')
-const logger = require('debugnyan')(`core:${coreIdentifier}`)
+const logger = require('../../lib/logger')(`core:${coreIdentifier}`)
 const walletTypes = [ 'mainnet', 'testnet' ]
 const clientLib = {
   parity: require('./clients/parity'),
