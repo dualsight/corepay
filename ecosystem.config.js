@@ -1,3 +1,4 @@
+const path = require('path')
 let processTag
 
 try {
@@ -11,7 +12,7 @@ try {
 module.exports = {
   apps: [{
     name: processTag,
-    script: 'index.js',
+    script: path.join(__dirname, 'index.js'),
     env: {
       NODE_ENV: 'production'
     },
