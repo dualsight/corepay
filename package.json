@@ -1,6 +1,6 @@
 {
   "name": "corepay",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A unified, secure and painless self-hosted cryptocurrency payments processor.",
   "main": "index.js",
   "scripts": {
