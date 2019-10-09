@@ -22,6 +22,8 @@ module.exports = {
       PRINT_LOGS: true
     },
     instances: 1,
+    max_restarts: 5,
+    max_memory_restart: '200M',
     kill_timeout: 3600000,
     kill_retry_time: 30000,
     wait_ready: true,
