@@ -246,7 +246,15 @@ const boot = () => {
             []
           )
             .then(async networkId => {
-              nodeNetworkType = BigNumber(networkId).isEqualTo(1)
+              const remoteId = BigNumber(networkId)
+              const localId = config.cores[coreIdentifier].network.chainId
+
+              if (!remoteId.isEqualTo(localId)) {
+                logger.error(`Remote chain ID (${remoteId}) is different than configured chain ID (${localId})`)
+                return resolveBoot(false)
+              }
+
+              nodeNetworkType = remoteId.isEqualTo(1)
                 ? 'mainnet'
                 : 'testnet'
             })
@@ -369,6 +377,7 @@ const ping = (app) => {
 
         if (result) {
           response.meta = {
+            network: nodeNetworkType,
             syncing: true,
             blockHeight: BigNumber(result.currentBlock).toString()
           }
@@ -385,15 +394,8 @@ const ping = (app) => {
 
 const getDepositAddress = (app, meta) => {
   return new Promise(async (resolve, reject) => {
-    if (meta && meta.type && !walletTypes.includes(meta.type)) {
-      return reject(new Error('Invalid wallet type!'))
-    }
-
-    const addrType = meta
-      ? meta.type || nodeNetworkType
-      : nodeNetworkType
     const $addrNonce = addrNonceCollection.findObject({
-      $: addrType,
+      $: nodeNetworkType,
       appId: app.id
     })
     let wallet
@@ -403,7 +405,7 @@ const getDepositAddress = (app, meta) => {
       // derive wallet from mnemonic
       wallet = ethers.Wallet.fromMnemonic(
         config.cores[coreIdentifier].wallet.mnemonic,
-        `m/44'/${addrType === 'testnet' ? 1 : 60}'/${app.id}'/0/${$addrNonce.value}`
+        `m/44'/${nodeNetworkType === 'testnet' ? 1 : 60}'/${app.id}'/0/${$addrNonce.value}`
       )
       $addr = addrCollection.findObject({
         $: String(wallet.signingKey.address).toLowerCase()
@@ -419,7 +421,7 @@ const getDepositAddress = (app, meta) => {
         fs.writeFile(
           path.join(
             walletBasePath,
-            addrType,
+            nodeNetworkType,
             app.id,
             rawWallet['x-ethers'].gethFilename
           ),
@@ -431,7 +433,10 @@ const getDepositAddress = (app, meta) => {
             addrNonceCollection.update($addrNonce)
             resolve({ 
               address: wallet.signingKey.address,
-              meta: { nonce: $addrNonce.value }
+              meta: {
+                network: nodeNetworkType,
+                nonce: $addrNonce.value
+              }
             })
           })
       })
@@ -456,11 +461,11 @@ const withdraw = async (app, transfers, meta) => {
 
     for (const transfer of transfers) {
       const chainId = BigNumber(
-        transfer.meta.chainId ||
-        config.cores[coreIdentifier].rpc.network.chainId
+        config.cores[coreIdentifier].network.chainId
       ).toNumber()
 
       transfer.meta = transfer.meta || {}
+      transfer.meta.network = nodeNetworkType
       transfer.receipt = await new Promise(resolveReceipt => {
         if (transfer.meta.contract) { // is token transfer
           const contractAddr = String(transfer.meta.contract).toLowerCase()

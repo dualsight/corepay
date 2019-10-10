@@ -179,11 +179,18 @@ const boot = () => {
 
     await rpc.getBlockchainInfo()
       .then(async info => {
-        if (info.chain === 'main') {
-          nodeNetworkType = 'mainnet'
-        } else if (info.chain === 'test') {
-          nodeNetworkType = 'testnet'
+        const localChain = config.cores[coreIdentifier].network.chain
+
+        if (info.chain === config.cores[coreIdentifier].network.chain) {
+          if (info.chain === 'main') {
+            nodeNetworkType = 'mainnet'
+          } else if (info.chain === 'test') {
+            nodeNetworkType = 'testnet'
+          } else {
+            return resolveBoot(false)
+          }
         } else {
+          logger.error(`Remote chain (${info.chain}) is different than configured chain (${localChain})`)
           return resolveBoot(false)
         }
       })
@@ -251,6 +258,7 @@ const ping = (app) => {
         resolve(
           result
             ? {
+              network: nodeNetworkType,
               pong: true,
               meta: {
                 blockHeight: BigNumber(result.blocks).toString()
@@ -268,19 +276,8 @@ const ping = (app) => {
 
 const getDepositAddress = (app, meta) => {
   return new Promise(async (resolve, reject) => {
-    if (meta && meta.type) {
-      if (meta.type !== nodeNetworkType) {
-        return reject(new Error(`Cannot import ${meta.type} wallet to ${nodeNetworkType} node!`))
-      }
-
-      if (!walletTypes.includes(meta.type)) {
-        return reject(new Error('Invalid wallet type!'))
-      }
-    }
-
-    const addrType = (meta && meta.type) ? meta.type : nodeNetworkType
     const $addrNonce = addrNonceCollection.findObject({
-      $: addrType,
+      $: nodeNetworkType,
       appId: app.id
     })
     let keyPair
@@ -291,10 +288,10 @@ const getDepositAddress = (app, meta) => {
       const seed = await bip39.mnemonicToSeed(config.cores[coreIdentifier].wallet.mnemonic)
       const root = bip32.fromSeed(seed)
       const keyNode = root.derivePath(
-        `m/44'/${addrType === 'mainnet' ? 0 : 1}'/${app.id}'/0/${$addrNonce.value}`
+        `m/44'/${nodeNetworkType === 'mainnet' ? 0 : 1}'/${app.id}'/0/${$addrNonce.value}`
       )
       const keyNetwork = bitcoin.networks[
-        addrType === 'mainnet'
+        nodeNetworkType === 'mainnet'
           ? 'bitcoin'
           : 'testnet'
       ]
@@ -321,7 +318,7 @@ const getDepositAddress = (app, meta) => {
         fs.writeFile(
           path.join(
             walletBasePath,
-            addrType,
+            nodeNetworkType,
             app.id,
             keyPair.address
           ),
@@ -336,7 +333,10 @@ const getDepositAddress = (app, meta) => {
             addrNonceCollection.update($addrNonce)
             resolve({ 
               address: keyPair.address,
-              meta: { nonce: $addrNonce.value }
+              meta: {
+                network: nodeNetworkType,
+                nonce: $addrNonce.value
+              }
             })
           })
       })
@@ -442,7 +442,9 @@ const withdraw = (app, targets, meta) => {
           targets.forEach(t => {
             t.result = {
               txid,
-              meta: {}
+              meta: {
+                network: nodeNetworkType
+              }
             }
           })
 
