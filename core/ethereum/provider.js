@@ -11,7 +11,7 @@ const provider = new ethers.providers.JsonRpcProvider(
     password: config.cores[coreIdentifier].rpc.password,
     allowInsecure: true
   },
-  { chainId: config.cores[coreIdentifier].rpc.network.chainId }
+  { chainId: config.cores[coreIdentifier].network.chainId }
 )
 
 module.exports = provider
