@@ -449,124 +449,125 @@ const getDepositAddress = (app, meta) => {
 
 const withdraw = async (app, transfers, meta) => {
   return new Promise(async (resolveWithdrawal, rejectWithdrawal) => {
+    if (hotWallet && hotWallet.signingKey) {
+      const report = []
+      let nonce = BigNumber(await new Promise(resolve => {
+        provider.getTransactionCount(hotWallet.signingKey.address, 'pending')
+          .then(num => resolve(num))
+          .catch(err => { return rejectWithdrawal(err) })
+      }))
 
-    if (!hotWallet) rejectWithdrawal(new Error('Hot wallet is undefined!'))
+      for (const transfer of transfers) {
+        const chainId = BigNumber(
+          config.cores[coreIdentifier].network.chainId
+        ).toNumber()
 
-    const report = []
-    let nonce = BigNumber(await new Promise(resolve => {
-      provider.getTransactionCount(hotWallet.signingKey.address, 'pending')
-        .then(num => resolve(num))
-        .catch(err => { return rejectWithdrawal(err) })
-    }))
+        transfer.meta = transfer.meta || {}
+        transfer.meta.network = nodeNetworkType
+        transfer.receipt = await new Promise(resolveReceipt => {
+          if (transfer.meta.contract) { // is token transfer
+            const contractAddr = String(transfer.meta.contract).toLowerCase()
+            const contractMeta = config
+              .cores[coreIdentifier]
+              .tokens[contractAddr]
+            
+            if (contractMeta) {
+              const contract = new ethers.Contract(
+                contractAddr,
+                abi.get(contractMeta.symbol, contractMeta.standard),
+                hotWallet
+              )
 
-    for (const transfer of transfers) {
-      const chainId = BigNumber(
-        config.cores[coreIdentifier].network.chainId
-      ).toNumber()
-
-      transfer.meta = transfer.meta || {}
-      transfer.meta.network = nodeNetworkType
-      transfer.receipt = await new Promise(resolveReceipt => {
-        if (transfer.meta.contract) { // is token transfer
-          const contractAddr = String(transfer.meta.contract).toLowerCase()
-          const contractMeta = config
-            .cores[coreIdentifier]
-            .tokens[contractAddr]
-          
-          if (contractMeta) {
-            const contract = new ethers.Contract(
-              contractAddr,
-              abi.get(contractMeta.symbol, contractMeta.standard),
-              hotWallet
-            )
-
-            new Promise((resolve, reject) => {
-              switch (contractMeta.standard) {
-                case 'ERC-20': {
-                  return resolve(contract.transfer(
-                    transfer.address,
-                    ethers.utils.parseUnits(transfer.value, contractMeta.decimals),
-                    {
-                      nonce: `0x${nonce.toString(16)}`,
-                      chainId
+              new Promise((resolve, reject) => {
+                switch (contractMeta.standard) {
+                  case 'ERC-20': {
+                    return resolve(contract.transfer(
+                      transfer.address,
+                      ethers.utils.parseUnits(transfer.value, contractMeta.decimals),
+                      {
+                        nonce: `0x${nonce.toString(16)}`,
+                        chainId
+                      }
+                    ))
+                  }
+                  case 'ERC-721': {
+                    if (transfer.meta.data) {
+                      return resolve(contract['safeTransferFrom(address,address,uint256,bytes)'](
+                        hotWallet.signingKey.address,
+                        transfer.address,
+                        ethers.utils.parseUnits(transfer.value, contractMeta.decimals),
+                        transfer.meta.data,
+                        {
+                          nonce: `0x${nonce.toString(16)}`,
+                          chainId
+                        }
+                      ))
+                    } else {
+                      return resolve(contract['safeTransferFrom(address,address,uint256)'](
+                        hotWallet.signingKey.address,
+                        transfer.address,
+                        ethers.utils.parseUnits(transfer.value, contractMeta.decimals),
+                        {
+                          nonce: `0x${nonce.toString(16)}`,
+                          chainId
+                        }
+                      ))
                     }
-                  ))
-                }
-                case 'ERC-721': {
-                  if (transfer.meta.data) {
-                    return resolve(contract['safeTransferFrom(address,address,uint256,bytes)'](
-                      hotWallet.signingKey.address,
-                      transfer.address,
-                      ethers.utils.parseUnits(transfer.value, contractMeta.decimals),
-                      transfer.meta.data,
-                      {
-                        nonce: `0x${nonce.toString(16)}`,
-                        chainId
-                      }
-                    ))
-                  } else {
-                    return resolve(contract['safeTransferFrom(address,address,uint256)'](
-                      hotWallet.signingKey.address,
-                      transfer.address,
-                      ethers.utils.parseUnits(transfer.value, contractMeta.decimals),
-                      {
-                        nonce: `0x${nonce.toString(16)}`,
-                        chainId
-                      }
-                    ))
                   }
+                  default: return reject(new Error('Unsupported token standard!'))
                 }
-                default: return reject(new Error('Unsupported token standard!'))
-              }
-            })
-              .then(tx => {
-                nonce = nonce.plus(1)
-                resolveReceipt({
-                  txid: tx.hash,
-                  meta: {
-                    mined: tx.blockNumber || false
-                  }
-                })
               })
-              .catch(err => {
-                logger.warn(err)
-                resolveReceipt(null)
-              })
-          } else {
-            logger.warn(new Error('Target contract:', transfer.meta.contract, 'not configured!'))
-            resolveReceipt(null)
-          }
-        } else { // is Ether transfer
-          const tx = {
-            to: transfer.address,
-            gasPrice: provider.getGasPrice(),
-            nonce: `0x${nonce.toString(16)}`,
-            data: transfer.meta.data || '0x',
-            value: ethers.utils.parseUnits(transfer.value, 18),
-            chainId
-          }
-          tx.gasLimit = provider.estimateGas(tx)
-
-          hotWallet.sign(tx)
-            .then(signedTx => {
-              provider.sendTransaction(signedTx)
                 .then(tx => {
                   nonce = nonce.plus(1)
-                  resolveReceipt({ mined: tx.blockNumber || false, txid: tx.hash })
+                  resolveReceipt({
+                    txid: tx.hash,
+                    meta: {
+                      mined: tx.blockNumber || false
+                    }
+                  })
                 })
                 .catch(err => {
                   logger.warn(err)
                   resolveReceipt(null)
                 })
-            })
-            .catch(err => resolveReceipt(null))
-        }
-      })
+            } else {
+              logger.warn(new Error('Target contract:', transfer.meta.contract, 'not configured!'))
+              resolveReceipt(null)
+            }
+          } else { // is Ether transfer
+            const tx = {
+              to: transfer.address,
+              gasPrice: provider.getGasPrice(),
+              nonce: `0x${nonce.toString(16)}`,
+              data: transfer.meta.data || '0x',
+              value: ethers.utils.parseUnits(transfer.value, 18),
+              chainId
+            }
+            tx.gasLimit = provider.estimateGas(tx)
 
-      report.push(transfer)
+            hotWallet.sign(tx)
+              .then(signedTx => {
+                provider.sendTransaction(signedTx)
+                  .then(tx => {
+                    nonce = nonce.plus(1)
+                    resolveReceipt({ mined: tx.blockNumber || false, txid: tx.hash })
+                  })
+                  .catch(err => {
+                    logger.warn(err)
+                    resolveReceipt(null)
+                  })
+              })
+              .catch(err => resolveReceipt(null))
+          }
+        })
+
+        report.push(transfer)
+      }
+
+      resolveWithdrawal(report)
+    } else {
+      return rejectWithdrawal(new Error('Hot wallet is undefined!'))
     }
-
-    resolveWithdrawal(report)
   })
 }
 
