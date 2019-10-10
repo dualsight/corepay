@@ -1,4 +1,4 @@
-# `POST` /:app/generate-deposit-address/:core
+# `POST` /:app/query-balance/:core
 > 
 <br />
 
@@ -22,7 +22,8 @@
 
     ```json
     {
-      "balance": "[numstring] -> the queried balance"
+      "balance": "[numstring] -> the queried balance",
+      "meta": "[object]? -> additional info about returned balance"
     }
     ```
 <br />
@@ -48,7 +49,7 @@
 ## Sample
 
   - ### Request
-    `POST` http://127.0.0.1:8700/mycryptomall/get-deposit-address/ethereum
+    `POST` http://127.0.0.1:8700/mycryptomall/query-balance/ethereum
     
     ```json
     {
@@ -62,7 +63,7 @@
 
       ```json
       {
-        "request": "/mycryptomall/get-deposit-address/ethereum",
+        "request": "/mycryptomall/query-balance/ethereum",
         "error": null,
         "result": {
           "balance": "3.456003",

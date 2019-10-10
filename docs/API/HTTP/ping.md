@@ -57,6 +57,7 @@
         "result": {
           "pong": true,
           "meta": {
+            "network": "testnet",
             "syncing": true,
             "blockHeight": "8848099"
           }

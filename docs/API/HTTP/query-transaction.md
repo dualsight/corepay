@@ -22,7 +22,8 @@
     ```json
     {
       "txid": "[string] -> transaction ID",
-      "confirmations": "[numstring] -> confirmation count"
+      "confirmations": "[numstring] -> confirmation count",
+      "meta": "[object]? -> additional info"
     }
     ```
 <br />
@@ -48,7 +49,10 @@
         "error": null,
         "result": {
           "txid": "0x2e7d451a5e3f44080349854235bb740594ddb172118fe09d261a883e1c8d6022",
-          "confirmations": "454"
+          "confirmations": "454",
+          "meta": {
+            "network": "testnet"
+          }
         }
       }
       ```

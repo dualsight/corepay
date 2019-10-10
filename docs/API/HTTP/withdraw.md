@@ -89,7 +89,9 @@
           {
             "address": "0x03ddfc2629051415ba8cc63c8db4281344abcf06",
             "value": "0.01",
-            "meta": {},
+            "meta": {
+              "network": "testnet"
+            },
             "receipt": {
               "txid": "0x73903678e19a36503953993ae5d479e9a2e531206a49361a7d795dd7dc9f205c",
               "meta": {
@@ -100,7 +102,10 @@
           {
             "address": "0xfcf729b07c12a536f87ee801d3cd8a4c3d4632ea",
             "value": "311",
-            "meta": { "contract": "0x5F9b34613D685e5c2b80c453C38cD8Dab0AC7814" },
+            "meta": {
+              "network": "testnet",
+              "contract": "0x5F9b34613D685e5c2b80c453C38cD8Dab0AC7814"
+            },
             "receipt": {
               "txid": "0x2e7d451a5e3f44080349854235bb740594ddb172118fe09d261a883e1c8d6022",
               "meta": {
