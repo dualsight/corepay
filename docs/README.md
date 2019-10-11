@@ -11,7 +11,8 @@
 
 ### Manual Installation
 - Download/clone this repository and `cd` to it.
-- `npm run setup` to register current directory as Corepay installation (may require elevated privileges depending on Node.js installation).
+- `npm run bootstrap` to install dependencies.
+- `npm run install-cli` to enable Corepay CLI binaries.
 
 ### Corepay CLI
 The Corepay CLI simpliflies controlling the Corepay daemon.
@@ -26,8 +27,12 @@ You may proceed to start the Corepay daemon with `corepay start`.
 The following are basic Corepay CLI commands for controlling the Corepay daemon:
 - `corepay start`: Starts Corepay daemon.
 - `corepay status`: Reports Corepay daemon status.
-- `corepay reload`: Safely restarts Corepay daemon (useful when you've changed configuration or updated Corepay).
+- `corepay reload`: Safely reloads Corepay daemon (useful when you've changed configuration or updated Corepay).
+- `corepay restart`: Safely restarts Corepay daemon (clean slate).
 - `corepay stop`: Safely stops Corepay daemon.
+
+### Uninstallation
+- `npm run uninstall-cli` to unlink Corepay CLI binaries.
 
 ## API
 
