@@ -1,10 +1,12 @@
 {
   "name": "corepay",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A unified, secure and painless self-hosted cryptocurrency payments processor.",
   "main": "index.js",
   "scripts": {
-    "setup": "npm i; npm link",
+    "bootstrap": "npm i",
+    "install-cli": "npm link",
+    "uninstall-cli": "npm unlink",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
