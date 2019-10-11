@@ -376,6 +376,7 @@ const withdraw = (app, targets, meta) => {
   let spendableAmount = BigNumber(0)
 
   for (const target of targets) {
+    target.meta.network = nodeNetworkType
     amounts[target.address] = target.value
     totalValue = totalValue.plus(target.value)
   }
@@ -447,10 +448,10 @@ const withdraw = (app, targets, meta) => {
       rpc.sendRawTransaction(tx.serialize())
         .then(txid => {
           targets.forEach(t => {
-            t.result = {
+            t.receipt = {
               txid,
               meta: {
-                network: nodeNetworkType
+                log: 'Success.',
               }
             }
           })
@@ -459,10 +460,29 @@ const withdraw = (app, targets, meta) => {
         })
         .catch(err => {
           logger.warn(err)
-          resolve(null)
+          targets.forEach(t => {
+            t.receipt = {
+              txid: null,
+              meta: {
+                log: err.message
+              }
+            }
+          })
+
+          resolve(targets)
         })
     } else {
-      reject(new Error(`Spendable balance is not enough: ${spendableAmount.toFormat()}`))
+      logger.warn('Insufficient funds!')
+      targets.forEach(t => {
+        t.receipt = {
+          txid: null,
+          meta: {
+            log: 'Insufficient funds!'
+          }
+        }
+      })
+
+      resolve(targets)
     }
   })
 }

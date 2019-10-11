@@ -528,11 +528,21 @@ const withdraw = async (app, transfers, meta) => {
                 })
                 .catch(err => {
                   logger.warn(err)
-                  resolveReceipt(null)
+                  resolveReceipt({
+                    txid: null,
+                    meta: {
+                      log: err.message
+                    }
+                  })
                 })
             } else {
-              logger.warn(new Error('Target contract:', transfer.meta.contract, 'not configured!'))
-              resolveReceipt(null)
+              logger.warn(new Error(`Target contract: ${transfer.meta.contract} is not configured!`))
+              resolveReceipt({
+                txid: null,
+                meta: {
+                  log: `Target contract: ${transfer.meta.contract} is not configured!`
+                }
+              })
             }
           } else { // is Ether transfer
             const tx = {
@@ -550,14 +560,30 @@ const withdraw = async (app, transfers, meta) => {
                 provider.sendTransaction(signedTx)
                   .then(tx => {
                     nonce = nonce.plus(1)
-                    resolveReceipt({ mined: tx.blockNumber || false, txid: tx.hash })
+                    resolveReceipt({
+                      txid: tx.hash,
+                      meta: {
+                        mined: tx.blockNumber || false,
+                        log: 'Success.'
+                      }
+                    })
                   })
                   .catch(err => {
                     logger.warn(err)
-                    resolveReceipt(null)
+                    resolveReceipt({
+                      txid: null,
+                      meta: {
+                        log: err.message
+                      }
+                    })
                   })
               })
-              .catch(err => resolveReceipt(null))
+              .catch(err => resolveReceipt({
+                txid: null,
+                meta: {
+                  log: err.message
+                }
+              }))
           }
         })
 
