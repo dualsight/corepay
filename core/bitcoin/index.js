@@ -34,7 +34,7 @@ const parseBlockByHeight = (blockNumber) => {
         .then(hash => {
           rpc.getBlock(hash, 2) // use obtained hash to fetch block with detailed txs
             .then(async block => {
-              batch = block.tx.map(tx => {
+              const batch = block.tx.map(tx => {
                 return {
                   method: 'gettransaction',
                   parameters: [
@@ -247,7 +247,14 @@ const boot = () => {
       }
     }, config.cores[coreIdentifier].parserDelay)
 
-    resolveBoot(true)
+    await rpc.getNetworkInfo()
+      .then(info => {
+        resolveBoot(`${info.subversion}#${info.protocolversion}#${nodeNetworkType}`)
+      })
+      .catch(err => {
+        logger.error(err)
+        resolveBoot(false)
+      })
   })
 }
 

@@ -351,7 +351,7 @@ const boot = () => {
             }
           }, config.cores[coreIdentifier].parserDelay)
   
-          resolveBoot(true)
+          resolveBoot(`${clientInfo}#${nodeNetworkType}`)
         } else {
           logger.error(new Error(`Unsupported Ethereum Client: ${clientInfo}`))
           return resolveBoot(false)

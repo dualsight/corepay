@@ -44,24 +44,24 @@ function init () {
       enabledCores.push(coreIdentifier)
       sequence.push(
         core.boot()
-          .then(booted => {
-            if (booted) {
-              screen.success('[\u2714]', coreIdentifier)
+          .then(version => {
+            if (version) {
+              screen.success('[\u2714]', coreIdentifier, '->', version)
             } else {
-              screen.error('[\u2757]', coreIdentifier)
+              screen.error('[\u2757]', coreIdentifier, '->', version)
             }
 
-            return booted
+            return version
           })
       )
     } else {
-      screen.warn('[\u2718]', coreIdentifier, 'core')
+      screen.warn('[\u2718]', coreIdentifier)
     }
   }
   
   Promise.all(sequence)
     .then((results) => {
-      if (results.some(r => r !== true)) {
+      if (results.some(r => !r)) {
         screen.error('Failed to boot some asset cores! Terminating...')
         process.exit(1)
       } else {
