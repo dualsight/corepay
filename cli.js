@@ -10,18 +10,18 @@ const runtime = require('./lib/runtime')
 
 program
   .version(version)
-  .option('-v, --version', 'print corepay version')
+  .option('-v, --version', 'print Corepay version')
 
 program
   .command('configure')
-  .description('configure corepay')
+  .description('configure Corepay')
   .action((env, options) => {
     require('./bootstrap')
   })
 
   program
     .command('status')
-    .description('corepay daemon status')
+    .description('Corepay daemon status')
     .action((env, options) => {
       runtime
         .status()
@@ -30,14 +30,14 @@ program
           process.exit(0)
         })
         .catch((err) => {
-          screen.error(`Failed to check corepay status: ${err.message}`)
+          screen.error(`Failed to check Corepay status: ${err.message}`)
           process.exit(1)
         })
     })
 
   program
     .command('start')
-    .description('start corepay daemon')
+    .description('start Corepay daemon')
     .action((env, options) => {
       runtime
         .start()
@@ -46,14 +46,14 @@ program
           process.exit(0)
         })
         .catch((err) => {
-          screen.error(`Failed to start corepay: ${err.message}`)
+          screen.error(`Failed to start Corepay: ${err.message}`)
           process.exit(1)
         })
     })
 
   program
     .command('reload')
-    .description('reload corepay daemon')
+    .description('reload Corepay daemon')
     .action(async (env, options) => {
       runtime
         .reload()
@@ -62,14 +62,30 @@ program
           process.exit(0)
         })
         .catch((err) => {
-          screen.error(`Failed to reload corepay: ${err.message}`)
+          screen.error(`Failed to reload Corepay: ${err.message}`)
+          process.exit(1)
+        })
+    })
+
+  program
+    .command('restart')
+    .description('restart Corepay daemon')
+    .action(async (env, options) => {
+      runtime
+        .restart()
+        .then((msg) => {
+          screen.success(`Corepay: ${msg}`)
+          process.exit(0)
+        })
+        .catch((err) => {
+          screen.error(`Failed to restart Corepay: ${err.message}`)
           process.exit(1)
         })
     })
 
     program
       .command('stop')
-      .description('stop corepay daemon')
+      .description('stop Corepay daemon')
       .action(async (env, options) => {
         runtime
           .stop()
@@ -78,7 +94,7 @@ program
             process.exit(0)
           })
           .catch((err) => {
-            screen.error(`Failed to stop corepay: ${err.message}`)
+            screen.error(`Failed to stop Corepay: ${err.message}`)
             process.exit(1)
           })
       })
