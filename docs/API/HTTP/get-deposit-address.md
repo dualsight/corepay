@@ -27,12 +27,6 @@
     ```
 <br />
 
-## Asset-specific Request Payload Params
-### Bitcoin
-- #### meta.addressType (optional, string) -> "legacy" || "p2sh-segwit" || "bech32"
-  Address of specified type will be generated, otherwise type will default to `addresstype` bitcoind config.
-<br />
-
 ## Asset-specific Response Payload Data
 ### Bitcoin
 - #### meta.network (optional, string) -> "mainnet" || "testnet"

@@ -68,7 +68,7 @@ All requests must carry a `X-Corepay-Signature` header. This is HMAC signature o
 
   const payload = JSON.stringify({
     meta: {
-      type: 'testnet'
+      address: '0xbcf783a8d2965700ac00795f022746ff6d034338'
     }
   })
 
@@ -78,7 +78,7 @@ All requests must carry a `X-Corepay-Signature` header. This is HMAC signature o
   ).toString(CryptoJS.enc.Hex)
   
 
-  fetch('http://localhost:8700/mycryptomall/get-deposit-address/bitcoin', {
+  fetch('http://localhost:8700/mycryptomall/query-balance/ethereum', {
       method: 'post',
       body: payload,
       headers: {
