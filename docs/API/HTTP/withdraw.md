@@ -33,7 +33,7 @@
         "value": "[numstring] -> amount or token ID",
         "meta": "[object]? -> additional info about transfer",
         "receipt": {
-          "txid": "[string] -> transaction ID",
+          "txid": "[string || null] -> transaction ID",
           "meta": "[object]? -> additional info about transaction"
         }
       }
@@ -95,7 +95,8 @@
             "receipt": {
               "txid": "0x73903678e19a36503953993ae5d479e9a2e531206a49361a7d795dd7dc9f205c",
               "meta": {
-                "mined": false
+                "mined": false,
+                "log": "Success."
               }
             }
           },
@@ -109,7 +110,8 @@
             "receipt": {
               "txid": "0x2e7d451a5e3f44080349854235bb740594ddb172118fe09d261a883e1c8d6022",
               "meta": {
-                "mined": false
+                "mined": false,
+                "log": "Success."
               }
             }
           }
