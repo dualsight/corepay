@@ -1,6 +1,7 @@
 const ethers = require('ethers')
 const BigNumber = require('bignumber.js')
 const abi = require('./abi')
+const helper = require('../../lib/helper')
 
 module.exports = {
   parseDeposits: (tokenStandard, addrCollection, receipt, contractMeta, highestBlock) => {
@@ -27,13 +28,13 @@ module.exports = {
                 switch (parsedLog.signature) {
                   case 'Transfer(address,address,uint256)': {
                     deposits.push({
+                      app: helper.getAppInfoById($addr.account),
                       core: 'ethereum',
                       symbol: contractMeta.symbol,
                       value: BigNumber(result[2]).div(Math.pow(10, contractMeta.decimals)).toString(),
                       beneficiary: result[1],
                       txid: log.transactionHash,
                       meta: {
-                        appId: $addr.account,
                         index: `el_${i}_${BigNumber(log.logIndex).toString()}`,
                         contract: receipt.to,
                         benefactor: result[0],

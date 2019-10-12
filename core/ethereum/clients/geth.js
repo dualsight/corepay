@@ -3,6 +3,7 @@ const coreIdentifier = path.basename(path.dirname(__dirname))
 const provider = require('../provider')
 const rpc = (...args) => provider.send(...args)
 const BigNumber = require('bignumber.js')
+const helper = require('../../../lib/helper')
 
 const _extractAddress = value => {
   if (!value) return value
@@ -26,13 +27,13 @@ const _parseCallToDeposits = (callObject, receipt, addrCollection, highestBlock,
 
   if ($addr && uintValue.isGreaterThan(0)) {
     deposits.push({
+      app: helper.getAppInfoById($addr.account),
       core: coreIdentifier,
       symbol: 'ETH',
       value: uintValue.div(Math.pow(10, 18)).toString(),
       beneficiary,
       txid: receipt.transactionHash,
       meta: {
-        appId: $addr.account,
         index: `ct_${index}}`,
         benefactor
       },

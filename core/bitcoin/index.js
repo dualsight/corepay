@@ -14,6 +14,7 @@ const bitcoin = require('bitcoinjs-lib')
 const bitcore = require('bitcore-lib')
 const storage = require('../../lib/db')()
 const logger = require('../../lib/logger')(`core:${coreIdentifier}`)
+const helper = require('../../lib/helper')
 const states = require('../../lib/states')
 const walletBasePath = path.join(
   __dirname, '..', '..', 'storage', 'wallets', coreIdentifier
@@ -54,13 +55,13 @@ const parseBlockByHeight = (blockNumber) => {
 
                           if ($addr && tx.details[i].category === 'receive') {
                             deposits.push({
+                              app: helper.getAppInfoById($addr.account),
                               core: coreIdentifier,
                               symbol: 'BTC',
                               value: BigNumber(tx.details[i].amount).toString(),
                               beneficiary: tx.details[i].address,
                               txid: tx.txid,
                               meta: {
-                                appId: $addr.account,
                                 index: BigNumber(tx.details[i].vout).toString()
                               },
                               confirmations: BigNumber(tx.confirmations).toString()
@@ -513,7 +514,7 @@ const queryBalance = (app, address, meta) => {
       : rpc.getBalance(
         '*',
         BigNumber(meta.confirmationTarget).toNumber() || 6,
-        meta.includeWatchonly || false
+        true
       )
 
       prom.then(balance => {

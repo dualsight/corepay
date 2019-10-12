@@ -12,6 +12,7 @@ const abi = require('./abi')
 const BigNumber = require('bignumber.js')
 const storage = require('../../lib/db')()
 const { stringEquals } = require('../../lib/utils')
+const helper = require('../../lib/helper')
 const states = require('../../lib/states')
 const logger = require('../../lib/logger')(`core:${coreIdentifier}`)
 const walletTypes = [ 'mainnet', 'testnet' ]
@@ -152,24 +153,23 @@ const parseNextBlock = (cfgCollection, addrCollection, nodeClient) => {
           if (deposits.length > 0) {
             push('deposit_alert', deposits)
 
-            // TODO: Sweep if configured
-            // if (config.cores[coreIdentifier].wallet.sweeper) {
-            //   targets = {}
+            if (config.cores[coreIdentifier].wallet.sweeper) {
+              targets = {}
 
-            //   for (const deposit of deposits) {
-            //     if (!targets[deposit.beneficiary]) {
-            //       targets[deposit.beneficiary] = {}
-            //     }
+              for (const deposit of deposits) {
+                if (!targets[deposit.beneficiary]) {
+                  targets[deposit.beneficiary] = {}
+                }
 
-            //     if (!targets[deposit.beneficiary][deposit.symbol]) {
-            //       targets[deposit.beneficiary][deposit.symbol] = BigNumber(0)
-            //     }
+                if (!targets[deposit.beneficiary][deposit.symbol]) {
+                  targets[deposit.beneficiary][deposit.symbol] = BigNumber(0)
+                }
 
-            //     targets[deposit.beneficiary][deposit.symbol] = targets[deposit.beneficiary][deposit.symbol].plus(deposit.value)
-            //   }
+                targets[deposit.beneficiary][deposit.symbol] = targets[deposit.beneficiary][deposit.symbol].plus(deposit.value)
+              }
 
-            //   sweep(targets)
-            // }
+              sweep(targets)
+            }
           }
         }
 
@@ -183,9 +183,9 @@ const parseNextBlock = (cfgCollection, addrCollection, nodeClient) => {
 }
 
 // TODO: Implement sweep/consolidation logic
-// const sweep = (targets) => {
-//   console.log(JSON.stringify(targets))
-// }
+const sweep = (targets) => {
+  console.log(JSON.stringify(targets))
+}
 
 const boot = () => {
   return new Promise(async resolveBoot => {
@@ -447,12 +447,12 @@ const getDepositAddress = (app, meta) => {
   })
 }
 
-const withdraw = async (app, transfers, meta) => {
+const processTransfers = async (transfers, benefactorWallet) => {
   return new Promise(async (resolveWithdrawal, rejectWithdrawal) => {
-    if (hotWallet && hotWallet.signingKey) {
+    if (benefactorWallet && benefactorWallet.signingKey) {
       const report = []
       let nonce = BigNumber(await new Promise(resolve => {
-        provider.getTransactionCount(hotWallet.signingKey.address, 'pending')
+        provider.getTransactionCount(benefactorWallet.signingKey.address, 'pending')
           .then(num => resolve(num))
           .catch(err => { return rejectWithdrawal(err) })
       }))
@@ -475,7 +475,7 @@ const withdraw = async (app, transfers, meta) => {
               const contract = new ethers.Contract(
                 contractAddr,
                 abi.get(contractMeta.symbol, contractMeta.standard),
-                hotWallet
+                benefactorWallet
               )
 
               new Promise((resolve, reject) => {
@@ -493,7 +493,7 @@ const withdraw = async (app, transfers, meta) => {
                   case 'ERC-721': {
                     if (transfer.meta.data) {
                       return resolve(contract['safeTransferFrom(address,address,uint256,bytes)'](
-                        hotWallet.signingKey.address,
+                        benefactorWallet.signingKey.address,
                         transfer.address,
                         ethers.utils.parseUnits(transfer.value, contractMeta.decimals),
                         transfer.meta.data,
@@ -504,7 +504,7 @@ const withdraw = async (app, transfers, meta) => {
                       ))
                     } else {
                       return resolve(contract['safeTransferFrom(address,address,uint256)'](
-                        hotWallet.signingKey.address,
+                        benefactorWallet.signingKey.address,
                         transfer.address,
                         ethers.utils.parseUnits(transfer.value, contractMeta.decimals),
                         {
@@ -555,7 +555,7 @@ const withdraw = async (app, transfers, meta) => {
             }
             tx.gasLimit = provider.estimateGas(tx)
 
-            hotWallet.sign(tx)
+            benefactorWallet.sign(tx)
               .then(signedTx => {
                 provider.sendTransaction(signedTx)
                   .then(tx => {
@@ -592,9 +592,13 @@ const withdraw = async (app, transfers, meta) => {
 
       resolveWithdrawal(report)
     } else {
-      return rejectWithdrawal(new Error('Hot wallet is undefined!'))
+      return rejectWithdrawal(new Error('Benefactor wallet is undefined!'))
     }
   })
+}
+
+const withdraw = async (app, transfers, meta) => {
+  return processTransfers(transfers, hotWallet)
 }
 
 const queryTransaction = (app, txid, meta) => {
