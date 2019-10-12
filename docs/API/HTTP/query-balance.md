@@ -32,8 +32,6 @@
 ### Bitcoin
 - #### meta.confirmationTarget (optional, numstring, default=6)
   Only include balances from transactions with specified confirmation count.
-- #### meta.includeWatchonly (optional, boolean, default=false)
-  Only used if `address` is not specified. Include balances of watchonly addresses.
 
 ### Ethereum
 - #### meta.contract (optional, string)
